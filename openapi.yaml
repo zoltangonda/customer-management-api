@@ -1,0 +1,215 @@
+openapi: 3.1.0
+info:
+  title: Customer Management API
+  description: API documentation for managing customers
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Customer
+  description: CRUD operations for customers
+paths:
+  /customers/{id}:
+    get:
+      tags:
+      - Customer
+      summary: Get customer by ID
+      operationId: getCustomerById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Customer retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "404":
+          description: Customer not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+    put:
+      tags:
+      - Customer
+      summary: Update customer details
+      operationId: updateCustomer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomerRequest"
+        required: true
+      responses:
+        "200":
+          description: Customer successfully updated
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: Invalid input or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "404":
+          description: Customer not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+    delete:
+      tags:
+      - Customer
+      summary: Delete customer by ID
+      operationId: deleteCustomer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Customer successfully deleted
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "404":
+          description: Customer not found
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /customers:
+    get:
+      tags:
+      - Customer
+      summary: Get customers by email
+      operationId: getAllCustomers
+      parameters:
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Customer(s) retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CustomerResponse"
+    post:
+      tags:
+      - Customer
+      summary: Create a new customer
+      operationId: createCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerRequest"
+        required: true
+      responses:
+        "201":
+          description: Customer successfully created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+        "400":
+          description: Invalid input or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+components:
+  schemas:
+    UpdateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Customer's full name
+        email:
+          type: string
+          description: Customer's email address
+        annualSpend:
+          type: number
+          description: Annual amount spent by the customer
+          example: 5000.0
+        lastPurchaseDate:
+          type: string
+          format: date
+          description: Date of the customer's last purchase
+          example: 2023-08-15
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        annualSpend:
+          type: number
+        lastPurchaseDate:
+          type: string
+          format: date
+        tier:
+          type: string
+    CreateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Customer full name
+          maxLength: 50
+          minLength: 2
+        email:
+          type: string
+          description: Customer email
+          minLength: 1
+        annualSpend:
+          type: number
+          description: Annual amount spent by the customer
+          example: 5000.0
+          minimum: 0.0
+        lastPurchaseDate:
+          type: string
+          format: date
+          description: Date of the customer's last purchase
+          example: 2023-08-15
+      required:
+      - email
+      - name
